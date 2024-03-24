@@ -1,7 +1,7 @@
 import { publicProcedure, router } from "../trpc";
 
-export const spellRouter = router({
+export const spellsRouter = router({
     get: publicProcedure.query(() => {
-        return [];
+        return ["dupa"];
     }),
 });
