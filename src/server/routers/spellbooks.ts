@@ -38,4 +38,15 @@ export const spellBookRouter = router({
                 },
             });
         }),
+    getById: publicProcedure.input(z.object({ id: z.number() })).query(async (opts) => {
+        const { input } = opts;
+        return await prisma.spellbook.findFirst({
+            where: {
+                id: input.id,
+            },
+            include: {
+                spells: true,
+            },
+        });
+    }),
 });
