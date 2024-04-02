@@ -22,9 +22,7 @@ export default function Spellbook() {
     const [description, setDescription] = useState<string>("");
 
     const addNewSpellbook = (e: React.FormEvent<HTMLFormElement>) => {
-        // console.log({ event });
-        console.log("dupa");
-        event?.preventDefault();
+        e.preventDefault();
         addSpellbook.mutate({ title, description });
         setTitle("");
         setDescription("");
@@ -42,15 +40,15 @@ export default function Spellbook() {
                 </Card>
             ))}
             <Dialog>
-                <DialogTrigger>
-                    <Card className="p-2">
+                <DialogTrigger asChild>
+                    <Card className="flex justify-center items-center group cursor-pointer transition-all duration-200 hover:border-indigo-600">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-6 h-6"
+                            className="w-10 h-10 text-gray-400 group-hover:text-indigo-600 transition-all duration-200"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
