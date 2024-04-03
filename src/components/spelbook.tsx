@@ -1,3 +1,4 @@
+"use client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shared/card";
 import {
     Dialog,
@@ -13,6 +14,9 @@ import { trpc } from "@/server/client";
 import { useState } from "react";
 import { Input } from "./shared/input";
 import { Button } from "./shared/button";
+import Link from "next/link";
+import Image from "next/image";
+import { toast } from "./shared/use-toast";
 
 export default function Spellbook() {
     const spellbook = trpc.spellbook.get.useQuery();
@@ -23,21 +27,38 @@ export default function Spellbook() {
 
     const addNewSpellbook = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        addSpellbook.mutate({ title, description });
+        addSpellbook.mutate({ title, description }, { onSettled: () => spellbook.refetch() });
         setTitle("");
         setDescription("");
+        toast({
+            variant: "success",
+            title: title,
+            description: `${title} spellbook has been added`,
+        });
     };
 
     return (
         <div className="grid grid-cols-4 gap-4">
             {spellbook.data?.map((spellbook) => (
-                <Card key={spellbook.id}>
-                    <CardHeader>
-                        <CardTitle>{spellbook.title}</CardTitle>
-                        <CardDescription>{spellbook.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>spells</CardContent>
-                </Card>
+                <Link key={spellbook.id} href={`/spellbook/${spellbook.id}`}>
+                    <Card key={spellbook.id} className="hover:scale-110 transition-all duration-200">
+                        <CardHeader>
+                            <CardTitle>{spellbook.title}</CardTitle>
+                            <CardDescription>{spellbook.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {spellbook.spells.map((spell) => (
+                                <Image
+                                    key={spell.id}
+                                    src={spell.image ?? ""}
+                                    width={30}
+                                    height={30}
+                                    alt={spell.title}
+                                />
+                            ))}
+                        </CardContent>
+                    </Card>
+                </Link>
             ))}
             <Dialog>
                 <DialogTrigger asChild>
