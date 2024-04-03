@@ -6,19 +6,23 @@ import path from "path";
 const pump = promisify(require("stream").pipeline);
 
 export async function POST(req: NextRequest, res: NextResponse) {
+    console.log("POST request received"); // Add this line
     try {
         const formData = await req.formData();
         const files = formData.getAll("files");
 
         if (files.length > 0) {
-            const file: File = files[0] as File;
-            const publicDir = path.resolve(process.cwd(), "public");
-            debugger;
-            fs.mkdirSync(publicDir, { recursive: true });
-            const filePath = path.join(publicDir, file.name);
+            const file: File = files[0] as File; // Cast to File
+            const filePath = path.join(process.cwd(), "public", file.name);
+            console.log({ filePath });
             const fileStream = fs.createWriteStream(filePath);
+
             const readableStream = file.stream();
+
+            // Create a pump to handle data transfer from readable stream to file stream
             await pump(readableStream, fileStream);
+
+            // Wait for the stream to finish writing
             await new Promise((resolve, reject) => {
                 fileStream.on("finish", resolve);
                 fileStream.on("error", reject);
@@ -29,6 +33,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             return NextResponse.json({ status: "fail", data: "No files provided" });
         }
     } catch (e) {
+        console.error("Error handling POST request:", e); // And thi
         return NextResponse.json({ status: "fail", data: e });
     }
 }
