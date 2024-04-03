@@ -37,3 +37,11 @@ next-env.d.ts
 
 # env
 **/.env
+
+# prisma
+prisma/migrations
+prisma/dev.db
+
+# packages locks
+packages-locks.json
+bun.lockb
