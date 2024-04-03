@@ -39,7 +39,7 @@ next-env.d.ts
 **/.env
 
 # prisma
-prisma/migrations
+prisma/migrations/
 prisma/dev.db
 
 # packages locks
