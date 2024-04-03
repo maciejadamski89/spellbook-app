@@ -16,9 +16,7 @@ import {
 import { useRef, useState } from "react";
 import { Input } from "@/components/shared/input";
 import { useToast } from "@/components/shared/use-toast";
-import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
-import { METHODS } from "http";
 
 type TSpellbookPage = {
     params: {
@@ -35,6 +33,7 @@ export default function SpellbookPage({ params }: TSpellbookPage) {
     const fileRef = useRef<HTMLInputElement>(null);
     const addSpell = trpc.spells.create.useMutation();
     const deleteSpell = trpc.spells.delete.useMutation();
+    const deleteSpellbook = trpc.spellbook.delete.useMutation();
     const router = useRouter();
     const handleAddNewSpell = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -53,52 +52,79 @@ export default function SpellbookPage({ params }: TSpellbookPage) {
         setTitle("");
         setDescription("");
         router.refresh();
+        toast({
+            variant: "success",
+            title: title,
+            description: `${title} spell has been added`,
+        });
     };
     const handleDeleteSpell = (id: number, spell: string) => {
         toast({
+            variant: "destructive",
             title: spell,
             description: `${spell} spell has been deleted`,
         });
         deleteSpell.mutate({ id }, { onSettled: () => spellbook.refetch() });
     };
+    const handleDeleteSpellbook = () => {
+        toast({
+            variant: "destructive",
+            title: spellbook.data?.title,
+            description: `${spellbook.data?.title} spellbook has been deleted`,
+        });
+        if (spellbook?.data?.id) {
+            deleteSpellbook.mutate({ id: spellbook.data.id });
+        } else {
+            console.error("Spellbook or spellbook data is undefined");
+        }
+        router.push("/");
+    };
     const { toast } = useToast();
     return (
-        <div>
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button>Add new spell</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <form onSubmit={handleAddNewSpell} className="space-y-4">
-                        <DialogHeader className="space-y-2">
-                            <DialogTitle>Create your spell</DialogTitle>
-                            <DialogDescription>
-                                Add some powerfull magic to your{" "}
-                                <span className="text-indigo-600">{spellbook?.data?.title}</span>
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex flex-col gap-y-4">
-                            <div className="space-y-2">
-                                <p className="font-medium">Title: </p>
-                                <Input onChange={(e) => setTitle(e.target.value as string)} />
+        <div className="w-full space-y-4">
+            <div className="flex gap-x-2">
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button>Add new spell</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <form onSubmit={handleAddNewSpell} className="space-y-4">
+                            <DialogHeader className="space-y-2">
+                                <DialogTitle>Create your spell</DialogTitle>
+                                <DialogDescription>
+                                    Add some powerfull magic to your{" "}
+                                    <span className="text-indigo-600">{spellbook?.data?.title}</span>
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex flex-col gap-y-4">
+                                <div className="space-y-2">
+                                    <p className="font-medium">Title: </p>
+                                    <Input onChange={(e) => setTitle(e.target.value as string)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <p className="font-medium">Description: </p>
+                                    <Input onChange={(e) => setDescription(e.target.value as string)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <p className="font-medium">Image: </p>
+                                    <Input type="file" ref={fileRef} />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <p className="font-medium">Description: </p>
-                                <Input onChange={(e) => setDescription(e.target.value as string)} />
-                            </div>
-                            <div className="space-y-2">
-                                <p className="font-medium">Image: </p>
-                                <Input type="file" ref={fileRef} />
-                            </div>
-                        </div>
-                        <DialogFooter className="sm:justify-start">
-                            <DialogClose asChild>
-                                <Button type="submit">Save</Button>
-                            </DialogClose>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
+                            <DialogFooter className="sm:justify-start">
+                                <DialogClose asChild>
+                                    <Button type="submit">Save</Button>
+                                </DialogClose>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+                <Button variant="outline" onClick={() => router.push("/")}>
+                    Back to spellbooks
+                </Button>
+                <Button variant="destructive" onClick={() => handleDeleteSpellbook()}>
+                    Delete spellbook: {spellbook?.data?.title}
+                </Button>
+            </div>
             <Table>
                 <TableCaption>Spell from {spellbook?.data?.title}</TableCaption>
                 <TableHeader>
