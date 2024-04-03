@@ -8,7 +8,9 @@
         "start": "next start",
         "lint": "next lint",
         "migrations": "npx prisma migrate dev --name init",
-        "prisma-studio": "npx prisma studio"
+        "prisma-studio": "npx prisma studio",
+        "bun-migrations": "bunx prisma migrate dev --name init",
+        "bun-prisma-studio": "npx prisma studio"
     },
     "dependencies": {
         "@prisma/client": "^5.11.0",
