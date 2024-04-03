@@ -1,0 +1,20 @@
+{
+    "name": "Development - Spellbook App",
+    "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+    "features": {
+        "ghcr.io/shyim/devcontainers-features/bun:0": {}
+    },
+    "postCreateCommand": "bun install && bun run bun-migrations && bun --bun run dev"
+    // "features": {},
+    // "customizations": {
+    //     "vscode": {
+    //         "settings": {},
+    //         "extensions": []
+    //     }
+    // },
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [3000],
+
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    // "remoteUser": "root"
+}
