@@ -6,7 +6,11 @@ const prisma = new PrismaClient();
 
 export const spellBookRouter = router({
     get: publicProcedure.query(async () => {
-        return prisma.spellbook.findMany();
+        return prisma.spellbook.findMany({
+            include: {
+                spells: true,
+            },
+        });
     }),
     create: publicProcedure
         .input(
@@ -32,6 +36,11 @@ export const spellBookRouter = router({
         )
         .mutation(async (opts) => {
             const { input } = opts;
+            await prisma.spell.deleteMany({
+                where: {
+                    spellbookId: input.id,
+                },
+            });
             return prisma.spellbook.delete({
                 where: {
                     id: input.id,
